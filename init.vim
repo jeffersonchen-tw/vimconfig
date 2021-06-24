@@ -22,7 +22,6 @@ set copyindent
 set wildmenu
 
 set cursorline
-set cursorcolumn
 
 set tabstop=4 softtabstop=4 shiftwidth=4
 set scrolloff=1
@@ -72,14 +71,25 @@ if exists('g:vscode')
   Plug 'matze/vim-move'
   Plug 'wellle/targets.vim'
   Plug 'machakann/vim-sandwich'
+  Plug 'easymotion/vim-easymotion'
+  Plug 'svermeulen/vim-yoink'
+  Plug 'hauleth/sad.vim'
 else
 	" ordinary neovim
   Plug 'wellle/targets.vim'
+  Plug 'prettier/vim-prettier'
+  Plug 'rafamadriz/neon'
+  Plug 'airblade/vim-gitgutter'
+  Plug 'Pocco81/NoCLC.nvim'
+  Plug 'romainl/vim-cool'
+  Plug 'Pocco81/HighStr.nvim'
+  Plug 'nvim-lua/popup.nvim'
+  Plug 'nvim-lua/plenary.nvim'
+  Plug 'nvim-telescope/telescope.nvim'
   Plug 'j5shi/CommandlineComplete.vim'
   Plug 'mg979/vim-visual-multi'
   Plug 'editorconfig/editorconfig-vim'
   Plug 'simnalamburt/vim-mundo'
-  Plug 'justinmk/vim-sneak'
   Plug 'joshdick/onedark.vim'
   Plug 'tpope/vim-commentary'
   Plug 'machakann/vim-sandwich'
@@ -89,7 +99,14 @@ else
   Plug 'alvan/vim-closetag'
   Plug 'terryma/vim-expand-region'
   Plug 'matze/vim-move'
-  Plug 'vim-airline/vim-airline'
+  Plug 'hoob3rt/lualine.nvim'
+  Plug 'ryanoasis/vim-devicons'
+  Plug 'svermeulen/vim-yoink'
+  Plug 'yuttie/comfortable-motion.vim'
+  Plug 'junegunn/vim-easy-align'
+  Plug 'q9w/hop.vim'
+  Plug 'hauleth/sad.vim'
+  Plug 'akinsho/nvim-bufferline.lua'
 endif
 call plug#end()
 
@@ -121,19 +138,7 @@ map <C-b> :bnext<CR>
 
 
 
-let g:sneak#label = 1
-" case insensitive sneak
-let g:sneak#use_ic_scs = 1
-" immediately move to the next instance of search, if you move the cursor sneak is back to default behavior
-let g:sneak#s_next = 1
-let g:sneak#prompt = '🔎'
-map f <Plug>Sneak_s
-map F <Plug>Sneak_S
-map t <Plug>Sneak_f
-map T <Plug>Sneak_F
-
-
-""startify
+"startify
 let g:startify_lists = [
 			\ { 'type': 'files',     'header': ['   Files']            },
 			\ { 'type': 'dir',       'header': ['   Current Directory '. getcwd()] },
@@ -172,8 +177,6 @@ nmap <space>e :CocCommand explorer<CR>
 autocmd BufEnter * if (winnr("$") == 1 && &filetype == 'coc-explorer') | q | endif
 syntax on
 
-" For dark version.
-colorscheme onedark
 
 autocmd ColorScheme * highlight CocHighlightText     ctermfg=LightMagenta    guifg=LightMagenta
 
@@ -182,7 +185,108 @@ map K <Plug>(expand_region_expand)
 map J <Plug>(expand_region_shrink)
 let g:move_key_modifier = 'C'
 
-let g:airline#extensions#tabline#enabled = 1
+" " status line
+" let g:airline#extensions#tabline#enabled = 1
+" let g:airline_powerline_fonts = 1
 
 cmap <C-p> <Plug>CmdlineCompleteBackward
 cmap <C-n> <Plug>CmdlineCompleteForward
+
+
+" use <tab> for trigger completion and navigate to the next complete item
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+inoremap <silent><expr> <Tab>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<Tab>" :
+      \ coc#refresh()
+
+
+" telescope
+" Find files using Telescope command-line sugar.
+nnoremap <leader>tf <cmd>Telescope find_files<cr>
+nnoremap <leader>tg <cmd>Telescope live_grep<cr>
+nnoremap <leader>tb <cmd>Telescope buffers<cr>
+nnoremap <leader>th <cmd>Telescope help_tags<cr>
+
+if exists("g:vscode")
+	"easymotion
+	let g:EasyMotion_do_mapping = 0 
+	map <Leader>L <Plug>(easymotion-bd-jk)
+	nmap <Leader>L <Plug>(easymotion-overwin-line)
+	map  <Leader>w <Plug>(easymotion-bd-w)
+	nmap <Leader>w <Plug>(easymotion-overwin-w)
+	map  / <Plug>(easymotion-sn)
+	"sneak
+	let g:sneak#label = 1
+	let g:sneak#use_ic_scs = 1
+	" immediately move to the next instance of search, if you move the cursor sneak is back to default behavior
+	let g:sneak#s_next = 1
+	let g:sneak#prompt = '🔎'
+	map f <Plug>Sneak_f
+	map F <Plug>Sneak_F
+	map t <Plug>Sneak_t
+	map T <Plug>Sneak_T
+else
+	map / <CMD>HopPattern<CR>
+	map <space>w <CMD>HopWord<CR>
+	map <space>l <CMD>HopLine<CR>
+	map f <CMD>HopChar1<CR>
+	nnoremap <space>gb :BufferLineMoveNext<CR>
+endif
+
+" Normal mode
+nmap <space>s <Plug>(sad-change-forward)
+nmap <space>S <Plug>(sad-change-backward)
+" Visual mode
+xmap <space>s <Plug>(sad-change-forward)
+xmap <space>S <Plug>(sad-change-backward
+
+
+nnoremap <space>t :vsplit term://zsh<cr>
+
+"vim-yoink
+nmap <c-n> <plug>(YoinkPostPasteSwapBack)
+nmap <c-p> <plug>(YoinkPostPasteSwapForward)
+
+nmap p <plug>(YoinkPaste_p)
+nmap P <plug>(YoinkPaste_P)
+
+" Also replace the default gp with yoink paste so we can toggle paste in this case too
+nmap gp <plug>(YoinkPaste_gp)
+nmap gP <plug>(YoinkPaste_gP)
+
+nmap y <plug>(YoinkYankPreserveCursorPosition)
+xmap y <plug>(YoinkYankPreserveCursorPosition)
+
+let g:yoinkAutoFormatPaste = 1
+
+" visual multi
+let g:VM_maps = {}
+let g:VM_maps['Find Under']         = '<C-d>'       
+let g:VM_maps['Find Subword Under'] = '<C-d>'
+
+if exists("g:vscode")
+else
+	colorscheme neon
+endif
+
+
+lua require'lualine'.setup {options = {lower = true, theme = 'neon'}}
+lua vim.o.termguicolors = true
+lua vim.g.neon_style = "light"
+lua vim.g.neon_italic_keyword = true
+lua vim.g.neon_italic_function = true
+lua vim.g.neon_italic_comment = true
+
+lua vim.api.nvim_command('highlight default HopNextKey  guifg=#ff007c gui=bold ctermfg=198 cterm=bold')
+
+lua vim.api.nvim_command('highlight default HopNextKey1 guifg=#00dfff gui=bold ctermfg=45 cterm=bold')
+
+lua vim.api.nvim_command('highlight default HopNextKey2 guifg=#2b8db3 ctermfg=33')
+
+lua vim.api.nvim_command('highlight default HopUnmatched guifg=#666666 ctermfg=242')
+
