@@ -63,19 +63,23 @@ set nowritebackup
 set signcolumn=yes
 set shortmess+=c
 
+set colorcolumn=80
+
 call plug#begin()
 if exists('g:vscode')
 	" VSCode extension
   Plug 'justinmk/vim-sneak'
+  Plug 'tpope/vim-surround'
   Plug 'terryma/vim-expand-region'
   Plug 'matze/vim-move'
   Plug 'wellle/targets.vim'
-  Plug 'machakann/vim-sandwich'
   Plug 'easymotion/vim-easymotion'
   Plug 'svermeulen/vim-yoink'
   Plug 'hauleth/sad.vim'
 else
 	" ordinary neovim
+  Plug 'voldikss/vim-floaterm'
+  Plug 'tpope/vim-surround'
   Plug 'wellle/targets.vim'
   Plug 'prettier/vim-prettier'
   Plug 'rafamadriz/neon'
@@ -92,7 +96,6 @@ else
   Plug 'simnalamburt/vim-mundo'
   Plug 'joshdick/onedark.vim'
   Plug 'tpope/vim-commentary'
-  Plug 'machakann/vim-sandwich'
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
   Plug 'mhinz/vim-startify'
   Plug 'kshenoy/vim-signature'
@@ -109,7 +112,6 @@ else
   Plug 'akinsho/nvim-bufferline.lua'
 endif
 call plug#end()
-
 
 let g:coc_global_extensions = [
 			\ "coc-highlight",
@@ -132,10 +134,8 @@ inoremap <silent><expr> <C-N> coc#refresh()
 inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 
-
 " move among buffers
 map <C-b> :bnext<CR>
-
 
 
 "startify
@@ -166,10 +166,9 @@ let g:startify_custom_header = [
 nnoremap <f6> :Startify<cr>
 
 
-
 "mundo
-nnoremap <C-u> :MundoToggle<cr>
-let g:mundo_width = 60
+nnoremap <C-r> :MundoToggle<cr>
+let g:mundo_width = 40
 
 
 " Explorer"
@@ -208,7 +207,6 @@ inoremap <silent><expr> <Tab>
 " telescope
 " Find files using Telescope command-line sugar.
 nnoremap <leader>tf <cmd>Telescope find_files<cr>
-nnoremap <leader>tg <cmd>Telescope live_grep<cr>
 nnoremap <leader>tb <cmd>Telescope buffers<cr>
 nnoremap <leader>th <cmd>Telescope help_tags<cr>
 
@@ -235,7 +233,6 @@ else
 	map <space>w <CMD>HopWord<CR>
 	map <space>l <CMD>HopLine<CR>
 	map f <CMD>HopChar1<CR>
-	nnoremap <space>gb :BufferLineMoveNext<CR>
 endif
 
 " Normal mode
@@ -246,11 +243,9 @@ xmap <space>s <Plug>(sad-change-forward)
 xmap <space>S <Plug>(sad-change-backward
 
 
-nnoremap <space>t :vsplit term://zsh<cr>
-
 "vim-yoink
-nmap <c-n> <plug>(YoinkPostPasteSwapBack)
-nmap <c-p> <plug>(YoinkPostPasteSwapForward)
+nmap <space>n <plug>(YoinkPostPasteSwapBack)
+nmap <space>p <plug>(YoinkPostPasteSwapForward)
 
 nmap p <plug>(YoinkPaste_p)
 nmap P <plug>(YoinkPaste_P)
@@ -266,21 +261,21 @@ let g:yoinkAutoFormatPaste = 1
 
 " visual multi
 let g:VM_maps = {}
-let g:VM_maps['Find Under']         = '<C-d>'       
-let g:VM_maps['Find Subword Under'] = '<C-d>'
+let g:VM_maps['Find Under']         = '<C-n>'       
+let g:VM_maps['Find Subword Under'] = '<C-n>'
 
-if exists("g:vscode")
+if exists('g:vscode')
 else
 	colorscheme neon
 endif
 
 
-lua require'lualine'.setup {options = {lower = true, theme = 'neon'}}
 lua vim.o.termguicolors = true
 lua vim.g.neon_style = "light"
 lua vim.g.neon_italic_keyword = true
 lua vim.g.neon_italic_function = true
 lua vim.g.neon_italic_comment = true
+lua require'lualine'.setup {options = {lower = true, theme = 'neon'}}
 
 lua vim.api.nvim_command('highlight default HopNextKey  guifg=#ff007c gui=bold ctermfg=198 cterm=bold')
 
@@ -290,3 +285,12 @@ lua vim.api.nvim_command('highlight default HopNextKey2 guifg=#2b8db3 ctermfg=33
 
 lua vim.api.nvim_command('highlight default HopUnmatched guifg=#666666 ctermfg=242')
 
+let g:floaterm_width=0.8
+let g:floaterm_height=0.7
+let g:floaterm_autoclose=2
+let g:floaterm_keymap_new = '<space>t'
+let g:floaterm_opener = 'vsplit'
+hi FloatermBorder guibg=skyblue guifg=Black
+
+"python path
+let g:python3_host_prog = '/opt/homebrew/Caskroom/miniforge/base/bin/python'
