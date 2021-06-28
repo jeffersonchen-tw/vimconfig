@@ -1,14 +1,3 @@
-if exists('g:vscode')
-	" VSCode extension
-	nnoremap <silent> <space> :call VSCodeNotify('whichkey.show')<CR>
-	xnoremap <silent> <space> :call VSCodeNotify('whichkey.show')<CR>
-	xmap gc  <Plug>VSCodeCommentary
-	nmap gc  <Plug>VSCodeCommentary
-	omap gc  <Plug>VSCodeCommentary
-	nmap gcc <Plug>VSCodeCommentaryLine
-endif
-
-
 set hidden
 syntax on
 
@@ -68,14 +57,14 @@ set colorcolumn=80
 call plug#begin()
 if exists('g:vscode')
 	" VSCode extension
-  Plug 'justinmk/vim-sneak'
+  "Plug 'justinmk/vim-sneak'
   Plug 'tpope/vim-surround'
   Plug 'terryma/vim-expand-region'
   Plug 'matze/vim-move'
   Plug 'wellle/targets.vim'
-  Plug 'easymotion/vim-easymotion'
-  Plug 'svermeulen/vim-yoink'
   Plug 'hauleth/sad.vim'
+  Plug 'q9w/hop.vim'
+  Plug 'bfredl/nvim-miniyank'
 else
 	" ordinary neovim
   Plug 'voldikss/vim-floaterm'
@@ -104,12 +93,15 @@ else
   Plug 'matze/vim-move'
   Plug 'hoob3rt/lualine.nvim'
   Plug 'ryanoasis/vim-devicons'
-  Plug 'svermeulen/vim-yoink'
+  Plug 'bfredl/nvim-miniyank'
   Plug 'yuttie/comfortable-motion.vim'
   Plug 'junegunn/vim-easy-align'
   Plug 'q9w/hop.vim'
   Plug 'hauleth/sad.vim'
   Plug 'akinsho/nvim-bufferline.lua'
+  Plug 'Mofiqul/vscode.nvim'
+  Plug 'ripxorip/aerojump.nvim', { 'do': ':UpdateRemotePlugins' }
+  Plug 'keith/swift.vim'
 endif
 call plug#end()
 
@@ -118,7 +110,7 @@ let g:coc_global_extensions = [
 			\ "coc-explorer",
 			\ "coc-lists",
 			\ "coc-vimlsp",
-			\ "coc-python",
+			\ "coc-pyright",
 			\ "coc-tasks",
 			\ "coc-yank",
 			\ "coc-json",
@@ -209,81 +201,76 @@ inoremap <silent><expr> <Tab>
 nnoremap <leader>tf <cmd>Telescope find_files<cr>
 nnoremap <leader>tb <cmd>Telescope buffers<cr>
 nnoremap <leader>th <cmd>Telescope help_tags<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 
-if exists("g:vscode")
-	"easymotion
-	let g:EasyMotion_do_mapping = 0 
-	map <Leader>L <Plug>(easymotion-bd-jk)
-	nmap <Leader>L <Plug>(easymotion-overwin-line)
-	map  <Leader>w <Plug>(easymotion-bd-w)
-	nmap <Leader>w <Plug>(easymotion-overwin-w)
-	map  / <Plug>(easymotion-sn)
-	"sneak
-	let g:sneak#label = 1
-	let g:sneak#use_ic_scs = 1
-	" immediately move to the next instance of search, if you move the cursor sneak is back to default behavior
-	let g:sneak#s_next = 1
-	let g:sneak#prompt = '🔎'
-	map f <Plug>Sneak_f
-	map F <Plug>Sneak_F
-	map t <Plug>Sneak_t
-	map T <Plug>Sneak_T
-else
-	map / <CMD>HopPattern<CR>
-	map <space>w <CMD>HopWord<CR>
-	map <space>l <CMD>HopLine<CR>
-	map f <CMD>HopChar1<CR>
-endif
+"if exists("g:vscode")
+"	"easymotion
+"	let g:EasyMotion_do_mapping = 0 
+"	map <Leader>L <Plug>(easymotion-bd-jk)
+"	nmap <Leader>L <Plug>(easymotion-overwin-line)
+"	map  <Leader>w <Plug>(easymotion-bd-w)
+"	nmap <Leader>w <Plug>(easymotion-overwin-w)
+"	map  / <Plug>(easymotion-sn)
+"	"sneak
+"	let g:sneak#label = 1
+"	let g:sneak#use_ic_scs = 1
+"	" immediately move to the next instance of search, if you move the cursor sneak is back to default behavior
+"	let g:sneak#s_next = 1
+"	let g:sneak#prompt = '🔎'
+"	map f <Plug>Sneak_f
+"	map F <Plug>Sneak_F
+"	map t <Plug>Sneak_t
+"	map T <Plug>Sneak_T
+"	map <space>w <CMD>HopWord<CR>
+"else
+"endif
+
+" hop
+map ? <CMD>HopPattern<CR>
+map <space>w <CMD>HopWord<CR>
+map <space>l <CMD>HopLine<CR>
+map f <CMD>HopChar1<CR>
+map F <CMD>HopChar2<CR>
 
 " Normal mode
 nmap <space>s <Plug>(sad-change-forward)
 nmap <space>S <Plug>(sad-change-backward)
-" Visual mode
-xmap <space>s <Plug>(sad-change-forward)
-xmap <space>S <Plug>(sad-change-backward
 
-
-"vim-yoink
-nmap <space>n <plug>(YoinkPostPasteSwapBack)
-nmap <space>p <plug>(YoinkPostPasteSwapForward)
-
-nmap p <plug>(YoinkPaste_p)
-nmap P <plug>(YoinkPaste_P)
-
-" Also replace the default gp with yoink paste so we can toggle paste in this case too
-nmap gp <plug>(YoinkPaste_gp)
-nmap gP <plug>(YoinkPaste_gP)
-
-nmap y <plug>(YoinkYankPreserveCursorPosition)
-xmap y <plug>(YoinkYankPreserveCursorPosition)
-
-let g:yoinkAutoFormatPaste = 1
 
 " visual multi
 let g:VM_maps = {}
 let g:VM_maps['Find Under']         = '<C-n>'       
 let g:VM_maps['Find Subword Under'] = '<C-n>'
 
-if exists('g:vscode')
+if exists('d:vscode')
+		" VSCode extension
+	nnoremap <silent> <space> :call VSCodeNotify('whichkey.show')<CR>
+	xnoremap <silent> <space> :call VSCodeNotify('whichkey.show')<CR>
+	xmap gc  <Plug>VSCodeCommentary
+	nmap gc  <Plug>VSCodeCommentary
+	omap gc  <Plug>VSCodeCommentary
+	nmap gcc <Plug>VSCodeCommentaryLine
 else
-	colorscheme neon
+lua << EOF
+require'lualine'.setup {options = {lower = true, theme = 'neon'}}
+
+vim.o.termguicolors = true
+vim.g.neon_style = "default"
+vim.g.neon_italic_keyword = true
+vim.g.neon_italic_function = true
+vim.g.neon_italic_comment = true
+
+vim.api.nvim_command('highlight default HopNextKey  guifg=#ff007c gui=bold ctermfg=198 cterm=bold')
+
+vim.api.nvim_command('highlight default HopNextKey1 guifg=#00dfff gui=bold ctermfg=45 cterm=bold')
+
+vim.api.nvim_command('highlight default HopNextKey2 guifg=#2b8db3 ctermfg=33')
+
+vim.api.nvim_command('highlight default HopUnmatched guifg=#666666 ctermfg=242')
+
+EOF
+colorscheme neon
 endif
-
-
-lua vim.o.termguicolors = true
-lua vim.g.neon_style = "light"
-lua vim.g.neon_italic_keyword = true
-lua vim.g.neon_italic_function = true
-lua vim.g.neon_italic_comment = true
-lua require'lualine'.setup {options = {lower = true, theme = 'neon'}}
-
-lua vim.api.nvim_command('highlight default HopNextKey  guifg=#ff007c gui=bold ctermfg=198 cterm=bold')
-
-lua vim.api.nvim_command('highlight default HopNextKey1 guifg=#00dfff gui=bold ctermfg=45 cterm=bold')
-
-lua vim.api.nvim_command('highlight default HopNextKey2 guifg=#2b8db3 ctermfg=33')
-
-lua vim.api.nvim_command('highlight default HopUnmatched guifg=#666666 ctermfg=242')
 
 let g:floaterm_width=0.8
 let g:floaterm_height=0.7
@@ -294,3 +281,11 @@ hi FloatermBorder guibg=skyblue guifg=Black
 
 "python path
 let g:python3_host_prog = '/opt/homebrew/Caskroom/miniforge/base/bin/python'
+
+
+map p <Plug>(miniyank-autoput)
+map P <Plug>(miniyank-autoPut)
+map <leader>n <Plug>(miniyank-cycle)
+map <leader>N <Plug>(miniyank-cycleback)
+
+nmap <space>aj <Plug>(AerojumpSpace)
