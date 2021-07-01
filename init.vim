@@ -67,12 +67,12 @@ if exists('g:vscode')
   Plug 'bfredl/nvim-miniyank'
 else
 	" ordinary neovim
+  Plug 'folke/todo-comments.nvim'
   Plug 'voldikss/vim-floaterm'
   Plug 'tpope/vim-surround'
   Plug 'wellle/targets.vim'
   Plug 'prettier/vim-prettier'
   Plug 'rafamadriz/neon'
-  Plug 'airblade/vim-gitgutter'
   Plug 'Pocco81/NoCLC.nvim'
   Plug 'romainl/vim-cool'
   Plug 'Pocco81/HighStr.nvim'
@@ -83,7 +83,6 @@ else
   Plug 'mg979/vim-visual-multi'
   Plug 'editorconfig/editorconfig-vim'
   Plug 'simnalamburt/vim-mundo'
-  Plug 'joshdick/onedark.vim'
   Plug 'tpope/vim-commentary'
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
   Plug 'mhinz/vim-startify'
@@ -102,6 +101,9 @@ else
   Plug 'Mofiqul/vscode.nvim'
   Plug 'ripxorip/aerojump.nvim', { 'do': ':UpdateRemotePlugins' }
   Plug 'keith/swift.vim'
+  Plug 'airblade/vim-gitgutter'
+  Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} 
 endif
 call plug#end()
 
@@ -122,9 +124,20 @@ let g:coc_global_extensions = [
 			\ "coc-sourcekit",
 			\ "coc-css"]
 
-inoremap <silent><expr> <C-N> coc#refresh()
 inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+" use <tab> for trigger completion and navigate to the next complete item
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
 
+inoremap <silent><expr> <Tab>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<Tab>" :
+      \ coc#refresh()
 
 " move among buffers
 map <C-b> :bnext<CR>
@@ -166,10 +179,7 @@ let g:mundo_width = 40
 " Explorer"
 nmap <space>e :CocCommand explorer<CR>
 autocmd BufEnter * if (winnr("$") == 1 && &filetype == 'coc-explorer') | q | endif
-syntax on
 
-
-autocmd ColorScheme * highlight CocHighlightText     ctermfg=LightMagenta    guifg=LightMagenta
 
 
 map K <Plug>(expand_region_expand)
@@ -242,7 +252,7 @@ let g:VM_maps = {}
 let g:VM_maps['Find Under']         = '<C-n>'       
 let g:VM_maps['Find Subword Under'] = '<C-n>'
 
-if exists('d:vscode')
+if exists('g:vscode')
 		" VSCode extension
 	nnoremap <silent> <space> :call VSCodeNotify('whichkey.show')<CR>
 	xnoremap <silent> <space> :call VSCodeNotify('whichkey.show')<CR>
@@ -251,24 +261,51 @@ if exists('d:vscode')
 	omap gc  <Plug>VSCodeCommentary
 	nmap gcc <Plug>VSCodeCommentaryLine
 else
-lua << EOF
-require'lualine'.setup {options = {lower = true, theme = 'neon'}}
+	lua << EOF
+	require'lualine'.setup {options = {lower = true, theme = 'neon'}}
 
-vim.o.termguicolors = true
-vim.g.neon_style = "default"
-vim.g.neon_italic_keyword = true
-vim.g.neon_italic_function = true
-vim.g.neon_italic_comment = true
+	require('hop').setup({create_hl_autocmd = true})
+	
+	vim.g.neon_style = "default"
+	vim.g.neon_italic_keyword = true
+	vim.g.neon_italic_function = true
+	vim.g.neon_italic_comment = true
 
-vim.api.nvim_command('highlight default HopNextKey  guifg=#ff007c gui=bold ctermfg=198 cterm=bold')
+	require'nvim-treesitter.configs'.setup {
+	  highlight = {
+		enable = true,
+		custom_captures = {
+		  -- Highlight the @foo.bar capture group with the "Identifier" highlight group.
+		  ["foo.bar"] = "Identifier",
+		},
+	  },
+	}
 
-vim.api.nvim_command('highlight default HopNextKey1 guifg=#00dfff gui=bold ctermfg=45 cterm=bold')
+	require'nvim-treesitter.configs'.setup {
+	  indent = {
+		enable = true
+	  }
+	}
 
-vim.api.nvim_command('highlight default HopNextKey2 guifg=#2b8db3 ctermfg=33')
-
-vim.api.nvim_command('highlight default HopUnmatched guifg=#666666 ctermfg=242')
-
+	require("todo-comments").setup {
+	signs = true,
+	sign_priority = 8,
+	keywords = {
+    FIX = {
+      icon = " ", -- icon used for the sign, and in search results
+      color = "error", -- can be a hex color, or a named color (see below)
+      alt = { "FIXME", "BUG", "FIXIT", "ISSUE" }, -- a set of other keywords that all map to this FIX keywords
+      -- signs = false, -- configure signs for some keywords individually
+    },
+    TODO = { icon = " ", color = "info" },
+    HACK = { icon = " ", color = "warning" },
+    WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
+    PERF = { icon = " ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
+    NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
+   },
+  }
 EOF
+
 colorscheme neon
 endif
 
