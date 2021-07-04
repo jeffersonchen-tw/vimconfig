@@ -7,7 +7,10 @@
 	"explorer.previewAction.onHover": false,
 	"explorer.keyMappings.global": {
     "<cr>": ["expandable?", "expand", "open"],
-    "v": "open:vsplit"
-  }
+    "v": "open:vsplit"},
+    "coc.preferences.formatOnSaveFiletypes": ["css", "markdown", "html", 
+    	"javascript", "python", "c", "cpp", "java", "php"],
+    "diagnostic.virtualTextCurrentLineOnly": false, 
+	"diagnostic.virtualText": true
 }
 

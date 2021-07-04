@@ -1,6 +1,8 @@
 set hidden
 syntax on
 
+set termguicolors
+
 set autoread
 filetype on
 filetype indent on
@@ -65,28 +67,38 @@ if exists('g:vscode')
   Plug 'hauleth/sad.vim'
   Plug 'q9w/hop.vim'
   Plug 'bfredl/nvim-miniyank'
+  " Plug 'asvetliakov/vim-easymotion'
 else
 	" ordinary neovim
+  " theme
+  Plug 'rafamadriz/neon'
+  Plug 'folke/tokyonight.nvim'
+  " indent line
+  Plug 'lukas-reineke/indent-blankline.nvim'
+  "
   Plug 'folke/todo-comments.nvim'
+  "
+  Plug 'norcalli/nvim-colorizer.lua'
+  Plug 'nicwest/vim-camelsnek'
   Plug 'voldikss/vim-floaterm'
   Plug 'tpope/vim-surround'
   Plug 'wellle/targets.vim'
   Plug 'prettier/vim-prettier'
-  Plug 'rafamadriz/neon'
   Plug 'Pocco81/NoCLC.nvim'
   Plug 'romainl/vim-cool'
   Plug 'Pocco81/HighStr.nvim'
   Plug 'nvim-lua/popup.nvim'
   Plug 'nvim-lua/plenary.nvim'
   Plug 'nvim-telescope/telescope.nvim'
-  Plug 'j5shi/CommandlineComplete.vim'
   Plug 'mg979/vim-visual-multi'
   Plug 'editorconfig/editorconfig-vim'
   Plug 'simnalamburt/vim-mundo'
   Plug 'tpope/vim-commentary'
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
   Plug 'mhinz/vim-startify'
+  " mark
   Plug 'kshenoy/vim-signature'
+  "
   Plug 'alvan/vim-closetag'
   Plug 'terryma/vim-expand-region'
   Plug 'matze/vim-move'
@@ -95,13 +107,15 @@ else
   Plug 'bfredl/nvim-miniyank'
   Plug 'yuttie/comfortable-motion.vim'
   Plug 'junegunn/vim-easy-align'
+  " motion
   Plug 'q9w/hop.vim'
+  " Plug 'asvetliakov/vim-easymotion'
+  "
   Plug 'hauleth/sad.vim'
   Plug 'akinsho/nvim-bufferline.lua'
-  Plug 'Mofiqul/vscode.nvim'
   Plug 'ripxorip/aerojump.nvim', { 'do': ':UpdateRemotePlugins' }
-  Plug 'keith/swift.vim'
   Plug 'airblade/vim-gitgutter'
+  Plug 'keith/swift.vim'
   Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} 
 endif
@@ -122,6 +136,7 @@ let g:coc_global_extensions = [
 			\ "coc-clangd",
 			\ "coc-prettier",
 			\ "coc-sourcekit",
+			\ "coc-prettier",
 			\ "coc-css"]
 
 inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
@@ -181,17 +196,9 @@ nmap <space>e :CocCommand explorer<CR>
 autocmd BufEnter * if (winnr("$") == 1 && &filetype == 'coc-explorer') | q | endif
 
 
-
 map K <Plug>(expand_region_expand)
 map J <Plug>(expand_region_shrink)
 let g:move_key_modifier = 'C'
-
-" " status line
-" let g:airline#extensions#tabline#enabled = 1
-" let g:airline_powerline_fonts = 1
-
-cmap <C-p> <Plug>CmdlineCompleteBackward
-cmap <C-n> <Plug>CmdlineCompleteForward
 
 
 " use <tab> for trigger completion and navigate to the next complete item
@@ -205,6 +212,24 @@ inoremap <silent><expr> <Tab>
       \ <SID>check_back_space() ? "\<Tab>" :
       \ coc#refresh()
 
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  elseif (coc#rpc#ready())
+    call CocActionAsync('doHover')
+  else
+    execute '!' . &keywordprg . " " . expand('<cword>')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor.
+" autocmd CursorHold * silent call CocActionAsync('highlight')
+
+command! -nargs=0 Format :call CocAction('format')
 
 " telescope
 " Find files using Telescope command-line sugar.
@@ -213,34 +238,6 @@ nnoremap <leader>tb <cmd>Telescope buffers<cr>
 nnoremap <leader>th <cmd>Telescope help_tags<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 
-"if exists("g:vscode")
-"	"easymotion
-"	let g:EasyMotion_do_mapping = 0 
-"	map <Leader>L <Plug>(easymotion-bd-jk)
-"	nmap <Leader>L <Plug>(easymotion-overwin-line)
-"	map  <Leader>w <Plug>(easymotion-bd-w)
-"	nmap <Leader>w <Plug>(easymotion-overwin-w)
-"	map  / <Plug>(easymotion-sn)
-"	"sneak
-"	let g:sneak#label = 1
-"	let g:sneak#use_ic_scs = 1
-"	" immediately move to the next instance of search, if you move the cursor sneak is back to default behavior
-"	let g:sneak#s_next = 1
-"	let g:sneak#prompt = '🔎'
-"	map f <Plug>Sneak_f
-"	map F <Plug>Sneak_F
-"	map t <Plug>Sneak_t
-"	map T <Plug>Sneak_T
-"	map <space>w <CMD>HopWord<CR>
-"else
-"endif
-
-" hop
-map ? <CMD>HopPattern<CR>
-map <space>w <CMD>HopWord<CR>
-map <space>l <CMD>HopLine<CR>
-map f <CMD>HopChar1<CR>
-map F <CMD>HopChar2<CR>
 
 " Normal mode
 nmap <space>s <Plug>(sad-change-forward)
@@ -252,6 +249,13 @@ let g:VM_maps = {}
 let g:VM_maps['Find Under']         = '<C-n>'       
 let g:VM_maps['Find Subword Under'] = '<C-n>'
 
+" hop
+map ? <CMD>HopPattern<CR>
+map <space>w <CMD>HopWord<CR>
+map <space>l <CMD>HopLine<CR>
+map f <CMD>HopChar1<CR>
+map F <CMD>HopChar2<CR>
+
 if exists('g:vscode')
 		" VSCode extension
 	nnoremap <silent> <space> :call VSCodeNotify('whichkey.show')<CR>
@@ -260,16 +264,32 @@ if exists('g:vscode')
 	nmap gc  <Plug>VSCodeCommentary
 	omap gc  <Plug>VSCodeCommentary
 	nmap gcc <Plug>VSCodeCommentaryLine
+	lua require('hop').setup({create_hl_autocmd = true})
+	"easymotion
+	" let g:EasyMotion_do_mapping = 0 
+	" let g:EasyMotion_smartcase = 1
+	" map <Leader>L <Plug>(easymotion-bd-jk)
+	" nmap <Leader>L <Plug>(easymotion-overwin-line)
+	" map  <Leader>w <Plug>(easymotion-bd-w)
+	" nmap <Leader>w <Plug>(easymotion-overwin-w)
+	" map  / <Plug>(easymotion-sn)
+	" omap  / <Plug>(easymotion-tn)
+	" map  f <Plug>(easymotion-bd-f)
+	" nmap f <Plug>(easymotion-overwin-f)
+	" map  n <Plug>(easymotion-next)
+	" map  N <Plug>(easymotion-prev)
 else
 	lua << EOF
 	require'lualine'.setup {options = {lower = true, theme = 'neon'}}
 
+	require("bufferline").setup{}
+
 	require('hop').setup({create_hl_autocmd = true})
 	
-	vim.g.neon_style = "default"
-	vim.g.neon_italic_keyword = true
-	vim.g.neon_italic_function = true
-	vim.g.neon_italic_comment = true
+	vim.g.neon_style = "default" 
+	vim.g.neon_italic_keyword = true 
+	vim.g.neon_italic_function = true 
+	vim.g.neon_italic_comment = true 
 
 	require'nvim-treesitter.configs'.setup {
 	  highlight = {
@@ -287,26 +307,10 @@ else
 	  }
 	}
 
-	require("todo-comments").setup {
-	signs = true,
-	sign_priority = 8,
-	keywords = {
-    FIX = {
-      icon = " ", -- icon used for the sign, and in search results
-      color = "error", -- can be a hex color, or a named color (see below)
-      alt = { "FIXME", "BUG", "FIXIT", "ISSUE" }, -- a set of other keywords that all map to this FIX keywords
-      -- signs = false, -- configure signs for some keywords individually
-    },
-    TODO = { icon = " ", color = "info" },
-    HACK = { icon = " ", color = "warning" },
-    WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
-    PERF = { icon = " ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
-    NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
-   },
-  }
 EOF
 
 colorscheme neon
+
 endif
 
 let g:floaterm_width=0.8
@@ -326,3 +330,4 @@ map <leader>n <Plug>(miniyank-cycle)
 map <leader>N <Plug>(miniyank-cycleback)
 
 nmap <space>aj <Plug>(AerojumpSpace)
+
